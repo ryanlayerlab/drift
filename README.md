@@ -13,8 +13,10 @@ optional arguments:
 ```
 
 ## Example
+The following command produces a line chart of the allele frequencies for each generation.
 ```
 python af.py --num_samples 10 --num_sites 10 --max_offspring 5
 ```
+<center><img src="/doc/fig1.png" width="300"/></center>
 
 
