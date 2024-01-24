@@ -23,6 +23,7 @@ def get_args():
     parser.add_argument('--out_file',
                         type=str,
                         required=True)
+    #HINT add a command line option to specify the fitness of each site
     return parser.parse_args()
     return parser.parse_args()
 
@@ -72,20 +73,25 @@ def mate(mom, dad, num_offspring):
         O.append(o)
     return O
 
-def one_generation(P, mean_offspring, stdev_offspring):
+def one_generation(P, exp_offspring, stdev_offspring):
     _P = []
     pairs = get_pairs(list(range(len(P))))
     for pair in pairs:
+
+        # HINT: calculate a new expected number of offspring based on 
+        # mom and dad's fitness. Rememeber that if they do not have the 
+        # alternate allele, they will encure a finess gains or losses
+
         offspring = mate(P[pair[0]],
                          P[pair[1]],
-                         int(np.random.normal(mean_offspring, stdev_offspring)))
+                         int(np.random.normal(exp_offspring, stdev_offspring))) #update this with new expected number of offspring
         _P += offspring
     return _P
 
-def n_generations(P, max_generations, mean_offspring, stdev_offspring):
+def n_generations(P, max_generations, exp_offspring, stdev_offspring):
     AF = [ get_af(P) ]
     for i in range(max_generations):
-        P = one_generation(P, mean_offspring, stdev_offspring)
+        P = one_generation(P, exp_offspring, stdev_offspring)
         if len(P) == 0:
             break
         AF.append(get_af(P))
@@ -110,6 +116,8 @@ def line_plot(AF, out_file):
 def main():
     args = get_args()
 
+    # HINT: instead of runing one simulation and plotting, run many simualtions
+    # to get a distribution of allele frequencies as the fintess values change
     P = get_sampples(args.num_samples, args.num_sites)
     AF = n_generations(P,
                        args.max_generations,
