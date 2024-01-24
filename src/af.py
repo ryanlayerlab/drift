@@ -1,6 +1,6 @@
 import argparse
 import random
-import numpy as mp
+import numpy as np
 import matplotlib.pyplot as plt
 
 def get_args():
@@ -11,12 +11,18 @@ def get_args():
     parser.add_argument('--num_sites',
                         type=int,
                         required=True)
-    parser.add_argument('--max_offspring',
+    parser.add_argument('--mean_offspring',
+                        type=float,
+                        required=True)
+    parser.add_argument('--stdev_offspring',
                         type=float,
                         required=True)
     parser.add_argument('--max_generations',
                         type=int,
                         default=10) 
+    parser.add_argument('--out_file',
+                        type=str,
+                        required=True)
     return parser.parse_args()
     return parser.parse_args()
 
@@ -66,20 +72,20 @@ def mate(mom, dad, num_offspring):
         O.append(o)
     return O
 
-def one_generation(P, max_offspring):
+def one_generation(P, mean_offspring, stdev_offspring):
     _P = []
     pairs = get_pairs(list(range(len(P))))
     for pair in pairs:
         offspring = mate(P[pair[0]],
                          P[pair[1]],
-                         random.randint(0,max_offspring))
+                         int(np.random.normal(mean_offspring, stdev_offspring)))
         _P += offspring
     return _P
 
-def n_generations(P, max_generations, max_offspring):
+def n_generations(P, max_generations, mean_offspring, stdev_offspring):
     AF = [ get_af(P) ]
     for i in range(max_generations):
-        P = one_generation(P, max_offspring)
+        P = one_generation(P, mean_offspring, stdev_offspring)
         if len(P) == 0:
             break
         AF.append(get_af(P))
@@ -104,14 +110,12 @@ def line_plot(AF, out_file):
 def main():
     args = get_args()
 
-    run_name = '-'.join(['num_sites',str(args.num_sites),
-                         'num_samples', str(args.num_samples),
-                         'max_generations', str(args.max_generations),
-                         'max_offspring', str(args.max_offspring)])
-    
     P = get_sampples(args.num_samples, args.num_sites)
-    AF = n_generations(P, args.max_generations, args.max_offspring)
-    line_plot(AF, run_name + '.lp.png')
+    AF = n_generations(P,
+                       args.max_generations,
+                       args.mean_offspring,
+                       args.stdev_offspring)
+    line_plot(AF, args.out_file)
 
 if __name__ == '__main__':
     main()
